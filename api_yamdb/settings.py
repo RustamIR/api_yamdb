@@ -40,12 +40,14 @@ INSTALLED_APPS = [
     # Local Apps
     'api',
     'users',
-    'users.apps.UsersConfig',
+    #'users.apps.UsersConfig',
     # Third-Party Apps
     'rest_framework',
     'django_filters',
 ]
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.Users'
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -126,5 +128,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+REST_FRAMEWORK = {
 
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)

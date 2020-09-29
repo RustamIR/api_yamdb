@@ -4,15 +4,11 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
 
-from .views import CommentViewSet, FollowViewSet, GroupViewSet, PostViewSet
+from users.views import UserViewSet, AuthEmail, AuthToken
 
 router = DefaultRouter()
-router.register(r'^posts', PostViewSet)
-router.register(r'^posts/(?P<post_id>\d+)/comments', CommentViewSet,
-                basename='comments')
-router.register(r'^group', GroupViewSet)
-router.register(r'^follow', FollowViewSet)
-router.register(r'^titles', TitleViewSet)
+router.register(r'users', UserViewSet, basename='users')
+
 
 
 urlpatterns = [

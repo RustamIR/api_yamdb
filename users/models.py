@@ -20,7 +20,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractUser):
+class Users(AbstractUser):
     ROLE = [
         ('USER', 'user'),
         ('ADMIN', 'admin'),

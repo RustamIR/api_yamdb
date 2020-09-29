@@ -1,5 +1,5 @@
 from rest_framework import viewsets, serializers, filters, generics, status
-from users.models import User
+from users.models import Users
 from api.serializers import UserSerializer
 from api.permissions import AdminPermissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = Users.objects.all()
     serializer_class = UserSerializer
     permission_classes = AdminPermissions
 
@@ -23,9 +23,9 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class AuthInfoEmail(generics.CreateAPIView):
+class AuthEmail(generics.CreateAPIView):
     permission_classes = (AllowAny,)
 
 
-class AuthInfoToken(generics.CreateAPIView):
+class AuthToken(generics.CreateAPIView):
     permission_classes = (AllowAny,)

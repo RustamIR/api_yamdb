@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 #from .models import Comment
-from users.models import User
+from users.models import Users
 
 
 
@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
                                           read_only=True)
 
     class Meta:
-        model = User
+        model = Users
         fields = '__all__'
 
 
