@@ -5,14 +5,7 @@ from users.models import Users
 
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(slug_field='username',
-                                          read_only=True)
-    post = serializers.SlugRelatedField(slug_field='id', read_only=True)
 
-    class Meta:
-        fields = '__all__'
-   #     model = Comment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,7 +17,18 @@ class UserSerializer(serializers.ModelSerializer):
         model = Users
         fields = '__all__'
 
+class EmailSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
 
+    class Meta:
+        model = Users
+        fields = ('email',)
 
+class EmailCodeSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=30)
 
+    class Meta:
+        model = Users
+        fields = ('email', 'code')
 

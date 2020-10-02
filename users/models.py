@@ -34,6 +34,7 @@ class Users(AbstractUser):
                                 max_length=250, blank=True,
                                 null=True, unique=True)
     bio = models.CharField(_('bio'), max_length=250, blank=True, null=True)
+    confirm_code = models.CharField(max_length=5)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
