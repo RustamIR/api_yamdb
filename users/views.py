@@ -11,16 +11,21 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.pagination import PageNumberPagination
+import secrets
+from django.contrib.auth.tokens import default_token_generator
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = Users.objects.all()
     serializer_class = UserSerializer
-    permission_classes = AdminPermissions
+    lookup_field = 'username'
+    #pagination_class = PageNumberPagination
+    permission_classes = (IsAuthenticated, AdminPermissions,)
 
-    @action(detail=True, methods=['PATCH', 'GET'], url_name='user_profile',
+    @action(detail=False, methods=['PATCH', 'GET'],
             permission_classes=(IsAuthenticated,))
-    def my_profile(self, request, ):
+    def me(self, request, ):
         serializer = UserSerializer(request.user,
                                     data=request.data, partial=True)
         if serializer.is_valid():
@@ -32,18 +37,30 @@ class AuthEmail(generics.CreateAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        serializer = EmailSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.data.get('email')
-            if Users.objects.filter(email=email).exists():
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            else:
-                user = Users.objects.create(email=email)
-                code = default_token_generator.make_token(user)
-                send_mail(
-                    'Ваш емейл не инвалид,держите код', code
-                )
-                return Response({code})
+        email = request.data.get('email')
+        try:
+            Users.objects.get(email=email)
+            return Response("Email адрес занят")
+        except Users.DoesNotExist:
+            confirm_code = secrets.token_hex(5)
+            Users.objects.create_user(email=email, confirm_code=confirm_code,
+                                      is_active=True)
+            send_mail(
+                'Registration',
+                'Your confirmation code is ' + str(confirm_code),
+                [str(email)],
+                fail_silently=False,
+            )
+            return Response("Ваш код ")
+
+
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 
 
 class AuthToken(generics.CreateAPIView):
@@ -51,12 +68,15 @@ class AuthToken(generics.CreateAPIView):
 
     def create(self, request):
         email = request.data.get('email')
-        code = request.data.get('confirmation_code')
+        code = request.data.get('confirm_code')
         serializer = EmailCodeSerializer(data={'email': email, 'code': code})
         serializer.is_valid(raise_exception=True)
 
         user = get_object_or_404(Users, email=email)
-        if not default_token_generator.check_token(user, code):
-            raise ValidationError('Неверный код и я не про свой')
 
-        return Response(("Твой токен: " + str(RefreshToken.for_user(user))))
+        if not default_token_generator.check_token(user, code):
+            raise ValidationError('Неверный код подтверждения!')
+
+        token = get_tokens_for_user(user).get('access')
+
+        return Response({'token': token})
