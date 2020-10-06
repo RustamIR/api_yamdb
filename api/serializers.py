@@ -2,7 +2,6 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from users.models import Users
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
