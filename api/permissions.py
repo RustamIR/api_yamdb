@@ -1,6 +1,5 @@
 from rest_framework.permissions import BasePermission
 
-
 class AdminPermissions(BasePermission):
     def has_permission(self, request, view):
         if request.user.role == request.user.ADMIN or request.user.is_staff:
