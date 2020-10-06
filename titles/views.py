@@ -42,10 +42,20 @@ class CategoriesViewSet(
 class GenresViewSet(
     mixins.ListModelMixin, 
     viewsets.GenericViewSet
+
 ):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly)
+    filter_backends = [filters.SearchFilter]
+
+    search_fields = ['name'] 
+
+
+class TitlesApiView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Titles.objects.all()
+    serializer_class = TitlesSerializer
+    permission_classes = (permissions.IsAuthenticated, AdminPermissions)
     filter_backends = [filters.SearchFilter]
     search_fields = ['name'] 
 
@@ -64,23 +74,8 @@ class GenresViewSet(
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-
-#class GenresAPIView(generics.RetrieveUpdateDestroyAPIView):
- #   queryset = Genres.objects.all()
-  #  serializer_class = GenresSerializer
-   # permission_classes = (permissions.IsAuthenticated, AdminPermissions,)
-    #filter_backends = [filters.SearchFilter]
-    #search_fields = ['name'] 
-
-
-class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Titles.objects.all()
-    serializer_class = TitlesSerializer
-    permission_classes = (permissions.IsAuthorOrReadOnly)
-    filter_backends = [DjangoFilterBackend]
-    filterset_field = ['category__name', 'genre__name']
-
     def get(self, request, titles_id):
         title = Titles.objects.get(titles_id=titles_id)
         serializer = TitlesSerializer(title) 
         return Response(serializer.data)
+
