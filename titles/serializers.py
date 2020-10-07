@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import Titles, Categories, Genres
 
 
+
+
 class TitlesSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Categories.objects.all(),

@@ -9,15 +9,14 @@ from rest_framework_simplejwt.views import (
 
 
 router = DefaultRouter()
-router.register(r'api/v1/titles', views.TitlesViewSet)
-router.register(r'api/v1/genres',  views.GenresViewSet)
-router.register(r'api/v1/categories', views.CategoriesViewSet)
-
+router.register(r'titles', views.TitlesViewSet)
+router.register(r'genres',  views.GenresViewSet)
+router.register(r'categories', views.CategoriesViewSet)
 
 
 urlpatterns = [
-    path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-]
-
+    path('v1/', include(router.urls)),
+    path('v1/auth/token/', AuthToken.as_view(), name='token_obtain_pair'),
+    path('v1/token/email/', AuthEmail.as_view(), name='confirmation_code'),
+] 
 
