@@ -6,63 +6,60 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from .models import Categories, Genres, Titles
 from .serializers import (CategoriesSerializer, GenresSerializer, TitlesSerializer))
-from .permissions import IsAuthorOrReadOnly, IsAdminUser
+from .permissions import IsReadOnly, IsAdminUser,
 from rest_framework.filters import SearchFilter
-#from api.permissions import AdminPermissions
+from api.permissions import AdminPermissions
 
 
-class CategoriesViewSet(
-    mixins.ListModelMixin,
+class CustomListViewSet(
+    mixins.CreateModelMixin,
+    mixins.DeleteModelMixin,
     viewsets.GenericViewSet
 ):
+    pass
+
+
+class CategoriesViewSet(CustomListViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated & AdminPermissions | ReadOnly)
     filter_backends = [filters.SearchFilter]
     search_fields = ['name'] 
 
-    @action(
-        detail=True, methods=['POST', 'DELETE'], 
-        permission_classes=(permissions.IsAdminUser)
-    )
-    def perform_create(request, id):
-        if request.method == 'POST':
-            serializer = CategoriesSerializer(data=request.data) 
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED) 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        elif request.method == 'DELETE':
-            categories.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+#    @action(
+ #       detail=True, methods=['POST', 'DELETE'], 
+  #      permission_classes=(permissions.IsAdminUser)
+   # )
+    #def create(request, id):
+     #   if request.method == 'POST':
+      #      serializer = CategoriesSerializer(data=request.data) 
+       #     if serializer.is_valid():
+        #        serializer.save()
+         #       return Response(serializer.data, status=status.HTTP_201_CREATED) 
+          #  return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GenresViewSet(
-    mixins.ListModelMixin, 
-    viewsets.GenericViewSet
-):
+class GenresViewSet(CustomListViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated & AdminPermissions | ReadOnly)
     filter_backends = [filters.SearchFilter]
     search_fields = ['name'] 
 
-    @action(
-        detail=True, methods=['POST', 'DELETE'], 
-        permission_classes=(permissions.IsAdminUser)
-    )
-    def perform_create(request, id):
-        genres = Genres.objects.get(id=id)
-        if request.method == 'POST':
-            serializer_class = GenresSerializer(data=request.data)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        elif request.method == 'DELETE':
-            genres.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+#    @action(
+ #       detail=True, methods=['POST', 'DELETE'], 
+  #      permission_classes=(permissions.IsAdminUser)
+   # )
+    #def perform_create(request, id):
+     #   genres = Genres.objects.get(id=id)
+      #  if request.method == 'POST':
+       #     serializer_class = GenresSerializer(data=request.data)
+        #    return Response(serializer.data, status=status.HTTP_200_OK)
+#        elif request.method == 'DELETE':
+ #           genres.delete()
+  #          return Response(status=status.HTTP_204_NO_CONTENT)
+   #     else:
+    #        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 #class GenresAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -73,14 +70,17 @@ class GenresViewSet(
     #search_fields = ['name'] 
 
 
-class TitlesViewSet(viewsets.ModelViewSet):
+class TitlesViewSet(
+    viewsets.ModelViewSet,
+    CustomListViewSet
+):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
-    permission_classes = (permissions.IsAuthorOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated & AdminPermissions | ReadOnly)
     filter_backends = [DjangoFilterBackend]
     filterset_field = ['category__name', 'genre__name']
 
-    def get(self, request, titles_id):
+    def retrieve(self, request, serializer, titles_id):
         title = Titles.objects.get(titles_id=titles_id)
-        serializer = TitlesSerializer(title) 
+        serializer = TitlesSerializer(title)
         return Response(serializer.data)
