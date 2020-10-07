@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from .models import Categories, Genres, Titles
 from .serializers import (CategoriesSerializer, GenresSerializer, TitlesSerializer))
-from .permissions import IsAuthorOrReadOnly, IsAdminUser
+from titles.permissions import IsAuthorOrReadOnly, IsAdminUser
 from rest_framework.filters import SearchFilter
 #from api.permissions import AdminPermissions
 
