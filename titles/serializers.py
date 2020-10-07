@@ -3,6 +3,7 @@ from .models import Titles, Categories, Genres
 
 
 
+
 class TitlesSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Categories.objects.all(),
@@ -13,6 +14,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         slug_field='slug',
         many=True
     )
+
     class Meta():
         fields ='__all__'
         model = Titles
@@ -24,7 +26,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
         model = Categories
 
 
-class Genres(serializers.ModelSerializer):
+class GenresSerializer(serializers.ModelSerializer):
     class Meta():
         fields ='__all__'
         model = Genres
