@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import CategoriesViewSet, GenresViewSet, TitlesViewSet
 from ..users.views import AuthToken, AuthEmail
 
+
 router = DefaultRouter()
 router.register(r'v1/titles', TitlesViewSet)
 router.register(r'v1/genres',  GenresViewSet)

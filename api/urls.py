@@ -4,8 +4,10 @@ from rest_framework.routers import DefaultRouter
 from users.views import UserViewSet, AuthEmail, AuthToken
 
 
+
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
+
 
 
 
@@ -17,4 +19,5 @@ urlpatterns = [
          name='token_obtain_pair'),
     path('v1/auth/email', AuthEmail.as_view(),
          name='confirmation_code'),
+
 ]
