@@ -1,17 +1,13 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from .views import CategoriesViewSet, GenresViewSet, TitlesViewSet
-from .views import views
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from ..users.views import AuthToken, AuthEmail
 
 
 router = DefaultRouter()
-router.register(r'titles', views.TitlesViewSet)
-router.register(r'genres',  views.GenresViewSet)
-router.register(r'categories', views.CategoriesViewSet)
+router.register(r'v1/titles', TitlesViewSet)
+router.register(r'v1/genres',  GenresViewSet)
+router.register(r'v1/categories', CategoriesViewSet)
 
 
 urlpatterns = [

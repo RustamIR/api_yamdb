@@ -26,7 +26,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
         model = Categories
 
 
-class Genres(serializers.ModelSerializer):
+class GenresSerializer(serializers.ModelSerializer):
     class Meta():
         fields ='__all__'
         model = Genres
