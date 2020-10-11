@@ -2,8 +2,6 @@ from rest_framework import serializers
 from .models import Titles, Categories, Genres
 
 
-
-
 class TitlesSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Categories.objects.all(),
@@ -15,18 +13,19 @@ class TitlesSerializer(serializers.ModelSerializer):
         many=True
     )
 
-    class Meta():
-        fields ='__all__'
+    class Meta:
+        fields = '__all__'
         model = Titles
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
-    class Meta():
-        fields ='__all__'
+    class Meta:
+        fields = '__all__'
         model = Categories
 
 
 class GenresSerializer(serializers.ModelSerializer):
-    class Meta():
-        fields ='__all__'
+    class Meta:
+        fields = '__all__'
+
         model = Genres

@@ -20,7 +20,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = Users.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
-    #pagination_class = PageNumberPagination
     permission_classes = (IsAuthenticated, AdminPermissions,)
 
     @action(detail=False, methods=['PATCH', 'GET'],
