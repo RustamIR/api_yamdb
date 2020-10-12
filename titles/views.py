@@ -1,17 +1,21 @@
-from rest_framework import viewsets, mixins, generics
+from requests import Response
+from rest_framework import generics, mixins, viewsets, status
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Categories, Genres, Titles
 from .serializers import (CategoriesSerializer, GenresSerializer,
                           TitlesSerializer)
-from titles.permissions import IsAdminOrReadOnly
+from api.permissions import IsModerator, IsOwner, ReadOnly, AdminPermissions, TitleAdmin
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
-from .filters import TitlesFilter
+from rest_framework.pagination import PageNumberPagination
+from titles.filters import TitlesFilter
 
 
 class CustomListViewSet(
+    mixins.ListModelMixin,
     mixins.CreateModelMixin,
-    mixins.DeleteModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
     pass
@@ -20,26 +24,28 @@ class CustomListViewSet(
 class CategoriesViewSet(CustomListViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (SearchFilter,)
+    permission_classes = (TitleAdmin,)
+    filter_backends = [SearchFilter]
     search_fields = ['name']
+    lookup_field = 'slug'
 
 
 class GenresViewSet(CustomListViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (TitleAdmin,)
     filter_backends = [SearchFilter]
-    search_fields = ['name']
+    search_fields = ['name', ]
+    lookup_field = 'slug'
 
 
 class TitlesViewSet(
-    viewsets.ModelViewSet,
     CustomListViewSet
 ):
+    pagination_class = PageNumberPagination
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (TitleAdmin,)
     filter_backends = [DjangoFilterBackend]
     filter_class = TitlesFilter
 
