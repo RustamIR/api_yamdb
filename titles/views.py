@@ -52,3 +52,4 @@ class TitlesViewSet(viewsets.ModelViewSet):
         return TitleListSerializer
 
 
+
