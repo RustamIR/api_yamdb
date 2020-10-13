@@ -37,20 +37,18 @@ class AuthEmail(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
-        try:
-            Users.objects.get(email=email)
-            return Response("Email адрес занят")
-        except Users.DoesNotExist:
-            confirm_code = secrets.token_hex(5)
-            Users.objects.create_user(email=email, confirm_code=confirm_code,
-                                      is_active=True)
-            send_mail(
-                'Registration',
-                'Your confirmation code is ' + str(confirm_code),
-                [str(email)],
-                fail_silently=False,
-            )
-            return Response("Ваш код ")
+        serializer = EmailSerializer(data={'email': email})
+        serializer.is_valid(raise_exception=True)
+        user, created = Users.objects.get_or_create(
+            username=email, email=email)
+        confirm_code = default_token_generator.make_token(user)
+        send_mail(
+            'Registration',
+            'Your confirmation code is ' + str(confirm_code),
+            [str(email)],
+            fail_silently=False,
+        )
+        return Response("Ваш код ")
 
 
 def get_tokens_for_user(user):

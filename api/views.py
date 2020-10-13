@@ -8,14 +8,14 @@ from rest_framework.exceptions import ValidationError
 from django.db.models import Avg
 
 
-
 class ReviewViewSet(viewsets.ModelViewSet):
-    """
-     Изменятьe/удалять могут только модеры,админ,автор
-    """
-    queryset = Review.objects.all()
+
     serializer_class = ReviewSerializer
     permission_classes = (ForReviewPerm,)
+
+    def get_queryset(self):
+        title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
@@ -28,20 +28,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title.save(update_fields=['rating'])
 
     def perform_update(self, serializer):
-        serializer.save()
         title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
         agg_score = Review.objects.filter(title=title).aggregate(Avg('score'))
         title.rating = agg_score['score__avg']
         title.save(update_fields=['rating'])
 
-    def get_queryset(self):
-        title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
-        return Review.objects.filter(title=title)
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """
-    Суть та же что и с ревью
-    """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = (ForReviewPerm,)

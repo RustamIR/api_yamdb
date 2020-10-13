@@ -10,6 +10,7 @@ certifi==2020.4.5.1       # via requests
 chardet==3.0.4            # via requests
 django==3.0.7             # via -r requirements.in, djangorestframework
 djangorestframework==3.11.0  # via -r requirements.in
+djangorestframework-simplejwt==4.3.0
 idna==2.9                 # via requests
 more-itertools==8.2.0     # via pytest
 packaging==20.3           # via pytest
