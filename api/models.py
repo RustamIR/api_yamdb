@@ -6,18 +6,24 @@ from titles.models import Titles
 
 class Review(models.Model):
     text = models.TextField(blank=False)
-    pub_date = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField(auto_now_add=True, db_index=True, )
     author = models.ForeignKey(Users, on_delete=models.CASCADE,
-                               related_name="review")
+                               related_name="aut_review")
     score = models.IntegerField(validators=[MinValueValidator(1),
                                             MaxValueValidator(10)])
     title = models.ForeignKey(Titles,
                               blank=True,
                               on_delete=models.CASCADE,
-                              related_name="review")
+                              related_name="tit_review")
 
     class Meta:
-        ordering = ['pub_date']
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        unique_together = ('author', 'title')
+        ordering = ["pub_date"]
+
+    def __str__(self):
+        return self.text
 
 
 class Comment(models.Model):
@@ -28,6 +34,9 @@ class Comment(models.Model):
                                related_name="comment")
     text = models.TextField(blank=False)
     pub_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.text
 
     class Meta:
         ordering = ["pub_date"]
