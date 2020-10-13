@@ -53,3 +53,5 @@ class TitlesViewSet(
         title = Titles.objects.get(titles_id=titles_id)
         serializer = TitlesSerializer(title)
         return Response(serializer.data)
+
+

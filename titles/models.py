@@ -3,7 +3,6 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
 
-
 User = get_user_model()
 
 
@@ -12,7 +11,7 @@ def current_year():
 
 
 def max_value_current_year(value):
-    return MaxValueValidator(current_year())(value)  
+    return MaxValueValidator(current_year())(value)
 
 
 class Categories(models.Model):
@@ -34,7 +33,8 @@ class Genres(models.Model):
 class Titles(models.Model):
     name = models.CharField(max_length=200, blank=False)
     year = models.PositiveIntegerField(
-        default=current_year(), validators=[MinValueValidator(1450), max_value_current_year])
+        default=current_year(),
+        validators=[MinValueValidator(1450), max_value_current_year])
     description = models.TextField(null=True, blank=True)
     category = models.ForeignKey(
         Categories,
