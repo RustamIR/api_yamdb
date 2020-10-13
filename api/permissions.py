@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
-
+from users.models import Users
 
 
 class AdminPermissions(BasePermission):
@@ -13,10 +13,13 @@ class ReadOnly(BasePermission):
     def has_permission(self, request, view):
         return request.method in SAFE_METHODS
 
+    def has_object_permission(self, request, view, obj):
+        return request.method in SAFE_METHODS
+
 
 class IsModerator(BasePermission):
     def has_permission(self, request, view):
-        if request.user.role == request.user.MODERATOR:
+        if request.user.role == Users.MODERATOR:
             return True
         return False
 
@@ -37,5 +40,22 @@ class TitleAdmin(BasePermission):
         if request.user.is_authenticated:
             return request.user.role == request.user.ADMIN \
                    or request.user.is_staff
+        else:
+            return False
+
+
+class ForReviewPerm(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS or request.user and request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        if request.user and request.user.is_authenticated:
+            if (request.user.is_staff or request.user.role == 'admin' or
+                    request.user.role == 'moderator' or
+                    obj.author == request.user or
+                    request.method == 'POST' and request.user.is_authenticated):
+                return True
+        elif request.method in SAFE_METHODS:
+            return True
         else:
             return False

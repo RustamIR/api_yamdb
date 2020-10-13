@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Categories, Genres, Titles
 from .serializers import (CategoriesSerializer, GenresSerializer,
-                          TitlesSerializer)
-from api.permissions import IsModerator, IsOwner, ReadOnly, AdminPermissions, TitleAdmin
+                          TitleCreateSerializer, TitleListSerializer)
+from api.permissions import ReadOnly, TitleAdmin
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -24,7 +24,7 @@ class CustomListViewSet(
 class CategoriesViewSet(CustomListViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = (TitleAdmin,)
+    permission_classes = (ReadOnly | TitleAdmin,)
     filter_backends = [SearchFilter]
     search_fields = ['name']
     lookup_field = 'slug'
@@ -33,25 +33,22 @@ class CategoriesViewSet(CustomListViewSet):
 class GenresViewSet(CustomListViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
-    permission_classes = (TitleAdmin,)
+    permission_classes = (ReadOnly | TitleAdmin,)
     filter_backends = [SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
 
 
-class TitlesViewSet(
-    CustomListViewSet
-):
+class TitlesViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     queryset = Titles.objects.all()
-    serializer_class = TitlesSerializer
-    permission_classes = (TitleAdmin,)
+    permission_classes = (ReadOnly | TitleAdmin,)
     filter_backends = [DjangoFilterBackend]
     filter_class = TitlesFilter
 
-    def retrieve(self, request, serializer, titles_id):
-        title = Titles.objects.get(titles_id=titles_id)
-        serializer = TitlesSerializer(title)
-        return Response(serializer.data)
+    def get_serializer_class(self):
+        if self.action in ('create', 'update', 'partial_update'):
+            return TitleCreateSerializer
+        return TitleListSerializer
 
 

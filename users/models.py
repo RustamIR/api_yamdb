@@ -18,6 +18,7 @@ class Users(AbstractUser):
                                 unique=True)
     confirm_code = models.CharField(max_length=5)
 
-
+    class Meta:
+        ordering = ["username"]
 
 
